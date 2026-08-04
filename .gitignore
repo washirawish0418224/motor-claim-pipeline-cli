@@ -1,0 +1,18 @@
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+
+# Environment files (passwords/API keys)
+.env
+
+# Output plots / images / logs
+*.svg
+*.log
+
+# Heavy data files (optional)
+data/*.csv
