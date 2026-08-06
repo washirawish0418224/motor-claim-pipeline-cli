@@ -1,14 +1,23 @@
+import mypy
 import argparse
 from pathlib import Path
-
+import re
 FIELD_FILE = "format.csv"
-breakpoint()
-for row in csvfile(FIELD_FILE):
-    print("OK")
-    
 
-class Record:
-    pass
+class Record: #contains a row of record
+    def __init__(self, record): #record = {'policy_number': 'MT...', ...}
+        self.record = record
+        self.status = [True, []] 
+
+    @property
+    def record(self):
+        return self.__record
+
+    @record.setter
+    def record(self, record): #check whether it's missing or pattern mismatch
+        #check pattern mismatch
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="A program that cleans, export errors into a file, and summarize into a report."
@@ -39,8 +48,8 @@ def main():
     )
     
     args = parser.parse_args()
-    
-    input_inspect()
+    field_list = [row for row in csvfile(FIELD_FILE)] #[{'field_name': '...', 'data_type': str, ...}]
+    input_inspect(args.input, args.separator)
         # raise FileNotFoundError("The file path provided could not be found.") 
 
     if not output_check():
@@ -49,17 +58,22 @@ def main():
 def input_inspect(input, separator):
     input_valid(input) #check whether the file path provided from the user is valid
 
-    thedict = {}
+    for row in csvfile(input, seperator): #row = {'policy_number': 'MT...', ...}
+        Record(row) #turn the record row into an object
+
 
 def row_inspect(row): #inspect the pattern of each element in the row using "re"
     # b_policy_number = re.search("pattern", row[''])
     pass
 
-def csvfile(input):
+def csvfile(input: str, sep: str, header: bool) -> dict:
     with open(input) as file:
-        reader = csv.DictReader(file)
+        if header == True:
+            reader = csv.DictReader(file, separator = sep)
+        elif header == False:
+            reader = csv.Reader(file, separator = sep)
         for row in reader:
-            yield row
+            yield row #expect {'policy_number': 'MT',...} or {'field_name': 'policy_number',...}
 
 def input_valid(input):
     try:
@@ -75,6 +89,7 @@ def input_valid(input):
     if extension != ".csv":
         raise TypeError(f"Expected .csv file type but got {extension} file type instead.")
 
+    raw_data = 
 def output_check():
     pass
     #check whether there is a folder that has the same name as the designated folder.
@@ -82,6 +97,11 @@ def output_check():
 def new_folder():
     pass
     #create a unique folder name for the output (mcd_output_YYYY-MM-DD_HH:MM:SS)
-     
+
+def field_extract(): 
+    field_list = [] #expect [("policy_number", str, "regex_pattern"),...]
+    for row in csvfile(FIELD_FILE):
+        field_list.append(tuple(row.values()))
+    return field_list
 if __name__ == "__main__":
     main()
