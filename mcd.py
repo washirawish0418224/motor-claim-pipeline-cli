@@ -1,7 +1,8 @@
-import mypy
+# import mypy
 import argparse
 from pathlib import Path
 import re
+import csv
 FIELD_FILE = "format.csv"
 
 class Record: #contains a row of record
@@ -16,7 +17,7 @@ class Record: #contains a row of record
     @record.setter
     def record(self, record): #check whether it's missing or pattern mismatch
         #check pattern mismatch
-
+        pass
 
 def main():
     parser = argparse.ArgumentParser(
@@ -46,9 +47,8 @@ def main():
         choices=[",", "-", "/", " ", "_"],
         help="Separators format in the input csv file."
     )
-    
     args = parser.parse_args()
-    field_list = [row for row in csvfile(FIELD_FILE)] #[{'field_name': '...', 'data_type': str, ...}]
+    field_list = [row for row in csvfile(FIELD_FILE, ",", True)] #[{'field_name': '...', 'data_type': str, ...}]
     input_inspect(args.input, args.separator)
         # raise FileNotFoundError("The file path provided could not be found.") 
 
@@ -56,11 +56,10 @@ def main():
         raise ValueError("There is already a folder with the same name in this location.")
     
 def input_inspect(input, separator):
-    input_valid(input) #check whether the file path provided from the user is valid
+    input_valid(input, separator) #check whether the file path provided from the user is valid
 
     for row in csvfile(input, seperator): #row = {'policy_number': 'MT...', ...}
         Record(row) #turn the record row into an object
-
 
 def row_inspect(row): #inspect the pattern of each element in the row using "re"
     # b_policy_number = re.search("pattern", row[''])
@@ -69,13 +68,13 @@ def row_inspect(row): #inspect the pattern of each element in the row using "re"
 def csvfile(input: str, sep: str, header: bool) -> dict:
     with open(input) as file:
         if header == True:
-            reader = csv.DictReader(file, separator = sep)
+            reader = csv.DictReader(file, delimiter = sep)
         elif header == False:
-            reader = csv.Reader(file, separator = sep)
+            reader = csv.Reader(file, delimiter = sep)
         for row in reader:
             yield row #expect {'policy_number': 'MT',...} or {'field_name': 'policy_number',...}
 
-def input_valid(input):
+def input_valid(input, sep):
     try:
         open(input)
     except FileNotFoundError:
@@ -84,19 +83,23 @@ def input_valid(input):
         pass
 
     file_path = Path(input)
-    extension = file_path.suffix()
-
+    extension = file_path.suffix
+    
     if extension != ".csv":
         raise TypeError(f"Expected .csv file type but got {extension} file type instead.")
 
-    raw_data = 
+    #check whether the dataset contains specific fields
+    raw_data_field = next(csvfile(input, sep, False))
+    if sorted(raw_data_field) != sorted(field_list):
+        raise ValueError(f"The given .csv file does not include the same set of fields as provided in the \"{FORMAT_FILE}\"")
+
 def output_check():
     pass
     #check whether there is a folder that has the same name as the designated folder.
  
 def new_folder():
     pass
-    #create a unique folder name for the output (mcd_output_YYYY-MM-DD_HH:MM:SS)
+    #create a unique folder name for the output ({input_filename}_mcd_output_YYYY-MM-DD_HH:MM:SS)
 
 def field_extract(): 
     field_list = [] #expect [("policy_number", str, "regex_pattern"),...]
