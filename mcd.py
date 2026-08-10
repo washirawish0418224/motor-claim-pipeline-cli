@@ -1,14 +1,22 @@
-# import mypy
+import mypy
 import argparse
 from pathlib import Path
 import re
 import csv
-FIELD_FILE = "format.csv"
+def field_extract(input): 
+    field_list = [] #expect [("policy_number", str, "regex_pattern"),...]
+    for row in csvfile(input):
+        field_list.append(tuple(row.values()))
+    return field_list
+class Const:
+    FIELD_FILE_NAME = "format.csv"
+    FIELD_FILE = field_extract(FIELD_FILE_NAME)
+        
 
 class Record: #contains a row of record
     def __init__(self, record): #record = {'policy_number': 'MT...', ...}
         self.record = record
-        self.status = [True, []] 
+        self.status = [True, []] # [False, [policy_number]] => mismatch pattern at policy_number 
 
     @property
     def record(self):
@@ -16,8 +24,8 @@ class Record: #contains a row of record
 
     @record.setter
     def record(self, record): #check whether it's missing or pattern mismatch
-        #check pattern mismatch
-        pass
+        #check pattern mismatch, if mismatch => set the self.status to false
+        field_list 
 
 def main():
     parser = argparse.ArgumentParser(
@@ -58,14 +66,11 @@ def main():
 def input_inspect(input, separator):
     input_valid(input, separator) #check whether the file path provided from the user is valid
 
-    for row in csvfile(input, seperator): #row = {'policy_number': 'MT...', ...}
-        Record(row) #turn the record row into an object
-
-def row_inspect(row): #inspect the pattern of each element in the row using "re"
-    # b_policy_number = re.search("pattern", row[''])
-    pass
+    for row in csvfile(input, separator): #row = {'policy_number': 'MT...', ...}
+        the_record = Record(row) #turn the record row into an object
 
 def csvfile(input: str, sep: str, header: bool) -> dict:
+    """Turn the .csv file into a programmable format."""
     with open(input) as file:
         if header == True:
             reader = csv.DictReader(file, delimiter = sep)
@@ -101,10 +106,5 @@ def new_folder():
     pass
     #create a unique folder name for the output ({input_filename}_mcd_output_YYYY-MM-DD_HH:MM:SS)
 
-def field_extract(): 
-    field_list = [] #expect [("policy_number", str, "regex_pattern"),...]
-    for row in csvfile(FIELD_FILE):
-        field_list.append(tuple(row.values()))
-    return field_list
 if __name__ == "__main__":
     main()

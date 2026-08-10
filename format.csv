@@ -1,2 +1,2 @@
-field_name, data_type, regex_pattern
-policy_number, str, #pattern#
+field_name, regex_pattern
+policy_number, some_regex 
