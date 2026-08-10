@@ -1,2 +1,2 @@
-field_name, regex_pattern
-policy_number, some_regex 
+field_name,regex_pattern
+policy_number,^MT-\d{6}$ 

@@ -1,5 +1,5 @@
 policy_number,claim_date,claimant_name,vehicle_type,coverage_type,claim_amount,premium_collected,claim_status
-MT-029341,2024-03-01,Somchai Jaidee,sedan,comprehensive,45000.00,52000.00,CLOSED
+MT-02934071,2024-03-01,Somchai Jaidee,sedan,comprehensive,45000.00,52000.00,CLOSED
 MT-112984,2024-03-02,Wanida Srisuk,pickup,third_party,12500.00,18000.00,OPEN
 MT-203847,2024-03-02,Nattapong Khamdi,suv,comprehensive,87300.00,70000.00,CLOSED
 MT-009183,2024-03-03,Pranee Thongkum,sedan,comprehensive,31000.00,45000.00,PENDING
