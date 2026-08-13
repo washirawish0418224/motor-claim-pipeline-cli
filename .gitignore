@@ -16,3 +16,8 @@ __pycache__/
 
 # Heavy data files (optional)
 data/*.csv
+
+#My own
+test.py
+test.ipynb
+sample2.csv
