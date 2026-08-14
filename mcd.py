@@ -1,4 +1,5 @@
 # import mypy
+import sys
 import shutil
 from datetime import datetime
 import argparse
@@ -44,10 +45,13 @@ class Const:
     FIELD_FILE_NAME = "format.csv"
     CLEAN_FILE_NAME = "cleaned_data.csv"
     ERROR_FILE_NAME = "errors.csv"
-        
+    ERROR_CAUSE_FIELD = "error_cause"
+    HEADER_ROW = [row[0] for row in csvfile(FIELD_FILE_NAME, ",", False) if row][1:]
+    RESULT_DIR_PATH = Path(__file__).parent / "Result"
+
 class Record: #contains a row of record
     def __init__(self, record): #record = {'policy_number': 'MT...', ...}
-        self.status = [True, []] # [False, [policy_number]] => mismatch pattern at policy_number 
+        self.status = [True, {Const.ERROR_CAUSE_FIELD:[]}] # [False, {'error_cause': [policy_number]}] => mismatch pattern at policy_number 
         self.record = record
 
     @property
@@ -61,9 +65,19 @@ class Record: #contains a row of record
         for field in csvfile(Const.FIELD_FILE_NAME, ",", True):
             field_value = record.get(field['field_name']) #value of each field
             regex_pattern = field['regex_pattern']
-            if not re.search(regex_pattern, field_value):
+            matching = None
+            # breakpoint()
+            if regex_pattern == 'DATE':
+                try:
+                    matching = datetime.strptime(field_value, "%Y-%m-%d") #ISO 8601 only
+                except ValueError:
+                    matching = None
+            else:
+                matching = re.search(regex_pattern, field_value)
+
+            if matching == None:
                 self.status[0] = False
-                self.status[1].append(field['field_name'])
+                self.status[1][Const.ERROR_CAUSE_FIELD].append(field['field_name'])
 
         self.__record = record
 
@@ -76,7 +90,7 @@ def main():
         "-i",
         "--input",
         type=str,
-        help="The file path of the raw claim data file.",
+        help="the file path of the raw claim data file.",
     )
     
     parser.add_argument(
@@ -84,7 +98,7 @@ def main():
         "--output",
         type=str,
         default=None,
-        help="The designated folder path for the output.",
+        help="the designated folder path for the output.",
     )
 
     parser.add_argument(
@@ -93,25 +107,54 @@ def main():
         type=str,
         default=",",
         choices=[",", "-", "/", " ", "_"],
-        help="Separators format in the input csv file."
+        help="separators format in the input csv file."
+    )
+
+    parser.add_argument(
+        "-c",
+        "--clear",
+        action="store_true",
+        help="clear all the files inside output folder before proceeding"
     )
 
     args = parser.parse_args()
-    if args.output is None and args.input:
-        args.output = new_folder_name(args.input)
 
-    input_valid(args.input, args.separator) #check whether the file path provided from the user is valid
-    result_dir = create_folder(args.output) #create a new folder and return the path
-    result_data_file = Path(Path(shutil.copy2(Path(args.input), result_dir)).rename(Const.CLEAN_FILE_NAME)) # a path for duplicated (clean) file
-    input_inspect(result_data_file, args.separator, result_dir)
+    if len(sys.argv) == 1:
+        parser.error("No argument provided.\nPlease specify any option.\nRun \"mcd.py -h\" for more information.")
+    if args.clear:
+        shutil.rmtree(Const.RESULT_DIR_PATH)
+        Const.RESULT_DIR_PATH.mkdir(parents=True, exist_ok=True)
+
+    if args.input:
+        if args.output is None:
+            args.output = new_folder_name(args.input)
+
+        input_valid(args.input, args.separator) #check whether the file path provided from the user is valid
+        result_dir = create_folder(args.output, args.input) #create a new folder and return the path
+        input_inspect(args.input, args.separator, result_dir)
+        print(f"The result is successfully created in the folder \"{result_dir.name}\".\nFolder location: {result_dir}")
+    elif not args.input and args.output:
+        parser.error("Please specify the input data with the flag \"-i\"\nRun \"mcd.py -h\" for more information.")
 
 def input_inspect(input, separator, result_dir):
     row_index = 0
     clean_file_path = result_dir / Const.CLEAN_FILE_NAME
     error_file_path = result_dir / Const.ERROR_FILE_NAME
-    for row in csvfile(input, separator, True): #row = {'policy_number': 'MT...', ...}
-        row_index += 1
-        the_record = Record(row) #turn the record row into an object
+
+    with open(clean_file_path, "w") as cf, open(error_file_path, "w") as ef:
+        cf_writer = csv.DictWriter(cf, fieldnames= Const.HEADER_ROW)
+        ef_writer = csv.DictWriter(ef, fieldnames= Const.HEADER_ROW + [Const.ERROR_CAUSE_FIELD])
+        cf_writer.writeheader()
+        ef_writer.writeheader()
+        for row in csvfile(input, separator, True): #row = {'policy_number': 'MT...', ...}
+            row_index += 1
+            the_record = Record(row) #turn the record row into an object
+            # the_record.status => [False, [policy_number]] 
+            # breakpoint()
+            if the_record.status[0] == True:
+                cf_writer.writerow(the_record.record)
+            elif the_record.status[0] == False:
+                ef_writer.writerow(the_record.record | the_record.status[1])
 
 def input_valid(input, sep):
     try:
@@ -125,22 +168,31 @@ def input_valid(input, sep):
     extension = file_path.suffix
     
     if extension != ".csv":
-        raise TypeError(f"Expected .csv file type but got {extension} file type instead.")
+        raise TypeError(f"Expecting .csv file type but got {extension} file type instead.")
 
     #check whether the dataset contains specific fields
     raw_data_field = next(csvfile(input, sep, False))
-    field_list = next(csvfile(Const.FIELD_FILE_NAME,",", False))
+    field_list = Const.HEADER_ROW
+    breakpoint()
     if set(field_list) <= set(raw_data_field):
-        raise ValueError(f"The given .csv file does not include the same set of fields as provided in the \"{Const.FORMAT_FILE_NAME}\"")
+        raise ValueError(f"The given .csv file does not include the same set of fields as provided in the \"{Const.FIELD_FILE_NAME}\"")
 
-def create_folder(folder_name):
-    result_parent_dir = Path(__file__).parent.parent / "Result"
-    if not result_parent_dir.is_dir():
-        new_f = new_folder_name()
-        folder_create = input(f"Unable to create a new folder named {folder_name}. There is already a folder with this name.\nUse the default name for the result folder?\nName:{new_f}\n-Y for Yes.")
+def create_folder(folder_name, input_filename):
+    result_parent_dir = Const.RESULT_DIR_PATH
+    new_f = folder_name
+    default_name = new_folder_name(input_filename)
+    result_dir = result_parent_dir / new_f
+    while result_dir.is_dir():
+        folder_create = input(f"Unable to create a new folder named \"{folder_name}\".\nThere is already a folder with this name.\n----------\nUse the default name for the result folder?\nName:{default_name}\n\"Y\" - Yes\n\"N\" - No, I want to change the name for output folder.\n\"C\" - Cancel\n----------\n")
+        folder_create = folder_create.strip().lower()
+        if folder_create == "y":
+            new_f = default_name
+        elif folder_create == "n":
+            new_f = input("Enter a new folder name:\n")
+        elif folder_create == "c":
+            SystemExit()
 
-        if not folder_create.strip.lower == "y":
-            raise ValueError(f"Please use other name for output folder.")
+        result_dir = result_parent_dir / new_f
 
     new_f = folder_name
     result_dir = result_parent_dir / new_f
@@ -154,16 +206,14 @@ def create_folder(folder_name):
     #add a header for both files
     the_reader = csvfile(Const.FIELD_FILE_NAME, ",", False)
     next(the_reader)
-    header_row = [row[0] for row in the_reader if row]
-
     
     with open(clean_file, mode = "w", newline = '', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(header_row)
+        writer.writerow(Const.HEADER_ROW)
 
     with open(error_file, mode = "w", newline = '', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(header_row + ['cause of error'])
+        writer.writerow(Const.HEADER_ROW + [Const.ERROR_CAUSE_FIELD])
 
     return result_dir
     #new folder is created
