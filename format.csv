@@ -1,0 +1,9 @@
+field_name,regex_pattern
+policy_number,^MT-\d{6}$
+claim_date,DATE
+claimant_name,^[a-zA-Z]+ [a-zA-Z]+$
+vehicle_type,^(sedan|pickup|suv|motorcycle)$
+coverage_type,^(comprehensive|third_party)$
+claim_amount,^(0|[1-9]\d*)\.\d{2}$
+premium_collected,^(0|[1-9]\d*)\.\d{2}$
+claim_status,^(PENDING|OPEN|CLOSED|REJECTED)$
