@@ -48,6 +48,12 @@ class Const:
     ERROR_CAUSE_FIELD = "error_cause"
     HEADER_ROW = [row[0] for row in csvfile(FIELD_FILE_NAME, ",", False) if row][1:]
     RESULT_DIR_PATH = Path(__file__).parent / "Result"
+    LOSS_FIELD_NAME = "claim_amount"
+    PREMIUM_FIELD_NAME = "premium_collected"
+    CLAIM_TYPE_FIELD_NAME = "coverage_type"
+    SUMMARY_FILE_NAME = "summary.txt"
+    TIME_NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 class Record: #contains a row of record
     def __init__(self, record): #record = {'policy_number': 'MT...', ...}
@@ -131,7 +137,9 @@ def main():
 
         input_valid(args.input, args.separator) #check whether the file path provided from the user is valid
         result_dir = create_folder(args.output, args.input) #create a new folder and return the path
-        input_inspect(args.input, args.separator, result_dir)
+        result_summary = input_inspect(args.input, args.separator, result_dir)
+        #result_summary = [('third_party', [clm, prem, l_ratio]),..., error_row]
+        write_summary(args.input, result_summary, result_dir)
         print(f"The result is successfully created in the folder \"{result_dir.name}\".\nFolder location: {result_dir}")
     elif not args.input and args.output:
         parser.error("Please specify the input data with the flag \"-i\"\nRun \"mcd.py -h\" for more information.")
@@ -145,16 +153,35 @@ def input_inspect(input, separator, result_dir):
         cf_writer = csv.DictWriter(cf, fieldnames= Const.HEADER_ROW)
         ef_writer = csv.DictWriter(ef, fieldnames= Const.HEADER_ROW + [Const.ERROR_CAUSE_FIELD])
         cf_writer.writeheader()
-        ef_writer.writeheader()
+        ef_writer.writeheader() 
+        result_dict = {}
+        error_row = 0
         for row in csvfile(input, separator, True): #row = {'policy_number': 'MT...', ...}
-            row_index += 1
             the_record = Record(row) #turn the record row into an object
             # the_record.status => [False, [policy_number]] 
+            #the_record.record = {'policy_number': 'MT...', ...}
             # breakpoint()
             if the_record.status[0] == True:
                 cf_writer.writerow(the_record.record)
+                clm_type = the_record.record[Const.CLAIM_TYPE_FIELD_NAME]
+                clm_amount = float(the_record.record[Const.LOSS_FIELD_NAME])
+                prem_amount = float(the_record.record[Const.PREMIUM_FIELD_NAME])
+                result_dict.setdefault(clm_type, [0, 0])
+                # breakpoint()
+                result_dict[clm_type][0] += clm_amount
+                result_dict[clm_type][1] += prem_amount
+
             elif the_record.status[0] == False:
                 ef_writer.writerow(the_record.record | the_record.status[1])
+                error_row += 1
+    result_dict = list(result_dict.items())
+    for type in result_dict:
+        #type = ('type', [clm, prem])
+        loss_ratio = float(type[1][0]) / float(type[1][1])
+        type[1].append(loss_ratio)
+    breakpoint()
+    result_dict.append(error_row)
+    return result_dict
 
 def input_valid(input, sep):
     try:
@@ -173,8 +200,8 @@ def input_valid(input, sep):
     #check whether the dataset contains specific fields
     raw_data_field = next(csvfile(input, sep, False))
     field_list = Const.HEADER_ROW
-    breakpoint()
-    if set(field_list) <= set(raw_data_field):
+    # breakpoint()
+    if not set(field_list) <= set(raw_data_field):
         raise ValueError(f"The given .csv file does not include the same set of fields as provided in the \"{Const.FIELD_FILE_NAME}\"")
 
 def create_folder(folder_name, input_filename):
@@ -200,9 +227,11 @@ def create_folder(folder_name, input_filename):
     
     clean_file = result_dir / Const.CLEAN_FILE_NAME
     error_file = result_dir / Const.ERROR_FILE_NAME
+    summary_file = result_dir / Const.SUMMARY_FILE_NAME
     clean_file.touch()
     error_file.touch()
-
+    summary_file.touch()
+    
     #add a header for both files
     the_reader = csvfile(Const.FIELD_FILE_NAME, ",", False)
     next(the_reader)
@@ -219,10 +248,25 @@ def create_folder(folder_name, input_filename):
     #new folder is created
  
 def new_folder_name(input_filename):
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    folder_name = f"MCD_{input_filename}_{time_now}"
+    folder_name = f"MCD_{input_filename}_{Const.TIME_NOW}"
     return folder_name
     #create a unique folder name for the output ({input_filename}_mcd_output_YYYY-MM-DD_HH:MM:SS)
 
+def write_summary(data_flie_name, result_summary, result_dir):
+    #result_summary = [('third_party', [clm, prem, l_ratio]),..., error_row]
+    summary_path = result_dir / Const.SUMMARY_FILE_NAME
+    errow_row = result_summary[-1]
+    with open(summary_path, mode = 'w') as file:
+        file.write(f"Summary report for: {data_flie_name}\n")
+        file.write(Const.TIME_NOW)
+        file.write('\n--------------------\n')
+        file.write(f'Number of malformed rows: {errow_row}\n\n')
+        file.write(f'Summary grouped by {Const.CLAIM_TYPE_FIELD_NAME}:\n')
+        for type in result_summary[0:-1]:
+            type_name = type[0]
+            clm_amount = type[1][0]
+            prem_amount = type[1][1]
+            loss_ratio = type[1][2]
+            file.write(f'Claim type \'{type_name}\':\n\t- Claim amount: {clm_amount}\n\t- Total premium collected: {prem_amount}\n\t- Loss Ratio: {loss_ratio}\n')
 if __name__ == "__main__":
     main()
