@@ -11,7 +11,8 @@ from pathlib import Path
         (['mcd.py', '-i', 'unknown.csv'], "The file \"unknown.csv\" could not be found.", FileNotFoundError), 
         (['mcd.py', '-i', 'README.md'], "Expecting .csv file type but got .md file type instead.", TypeError),
         (['mcd.py', '-i', 'sample.csv', '-o', 'my_new_folder'], "The result is successfully created in the folder \"my_new_folder\".", 'print'),
-        (['mcd.py', '-i', 'sample.csv', '-o', 'existed_result'], "successfully created in the folder \"existed_result\"", 'print')
+        (['mcd.py', '-i', 'sample.csv', '-o', 'existed_result'], "successfully created in the folder \"existed_result\"", 'print'),
+        (['mcd.py', '-c'], 'is successfully cleared', 'print')
     ],
     ids=["normal",
          "missing_field_file",
@@ -19,7 +20,8 @@ from pathlib import Path
          "file_not_found",
          "wrong_file_type",
          "custom_result_folder_name",
-         "existed_folder_name"] # Names for each test case
+         "existed_folder_name",
+         "clear_directory"] # Names for each test case
 )
 def test_end2end(code, expected, test_type, monkeypatch, capsys, tmp_path):
     monkeypatch.setattr(Const, "RESULT_DIR_PATH", tmp_path / "Result")
@@ -37,4 +39,6 @@ def test_end2end(code, expected, test_type, monkeypatch, capsys, tmp_path):
         with pytest.raises(test_type) as exc_info:
             main()
         assert expected in str(exc_info.value)
+
+
 
