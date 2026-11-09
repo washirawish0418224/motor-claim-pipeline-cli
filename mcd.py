@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 import re
 import csv
+
 def field_extract(input): 
     field_list = [] #expect [("policy_number", str, "regex_pattern"),...]
     for row in csvfile(input):
@@ -72,7 +73,6 @@ class Record: #contains a row of record
             field_value = record.get(field['field_name']) #value of each field
             regex_pattern = field['regex_pattern']
             matching = None
-            # breakpoint()
             if regex_pattern == 'DATE':
                 try:
                     matching = datetime.strptime(field_value, "%Y-%m-%d") #ISO 8601 only
@@ -130,7 +130,7 @@ def main():
     if args.clear:
         shutil.rmtree(Const.RESULT_DIR_PATH)
         Const.RESULT_DIR_PATH.mkdir(parents=True, exist_ok=True)
-
+        print(f'The directory \"{Const.RESULT_DIR_PATH}\" is successfully cleared.')
     if args.input:
         if args.output is None:
             args.output = new_folder_name(args.input)
@@ -160,14 +160,12 @@ def input_inspect(input, separator, result_dir):
             the_record = Record(row) #turn the record row into an object
             # the_record.status => [False, [policy_number]] 
             #the_record.record = {'policy_number': 'MT...', ...}
-            # breakpoint()
             if the_record.status[0] == True:
                 cf_writer.writerow(the_record.record)
                 clm_type = the_record.record[Const.CLAIM_TYPE_FIELD_NAME]
                 clm_amount = float(the_record.record[Const.LOSS_FIELD_NAME])
                 prem_amount = float(the_record.record[Const.PREMIUM_FIELD_NAME])
                 result_dict.setdefault(clm_type, [0, 0])
-                # breakpoint()
                 result_dict[clm_type][0] += clm_amount
                 result_dict[clm_type][1] += prem_amount
 
@@ -179,7 +177,6 @@ def input_inspect(input, separator, result_dir):
         #type = ('type', [clm, prem])
         loss_ratio = float(type[1][0]) / float(type[1][1])
         type[1].append(loss_ratio)
-    breakpoint()
     result_dict.append(error_row)
     return result_dict
 
@@ -200,7 +197,6 @@ def input_valid(input, sep):
     #check whether the dataset contains specific fields
     raw_data_field = next(csvfile(input, sep, False))
     field_list = Const.HEADER_ROW
-    # breakpoint()
     if not set(field_list) <= set(raw_data_field):
         raise ValueError(f"The given .csv file does not include the same set of fields as provided in the \"{Const.FIELD_FILE_NAME}\"")
 
