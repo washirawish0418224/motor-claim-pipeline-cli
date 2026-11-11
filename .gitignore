@@ -1,23 +1,13 @@
 # Virtual environments
 .venv/
 env/
-venv/
 
 # Python bytecode & cache
 __pycache__/
+.pytest_cache
 *.pyc
 
 # Environment files (passwords/API keys)
 .env
 
-# Output plots / images / logs
-*.svg
-*.log
-
-# Heavy data files (optional)
-data/*.csv
-
-#My own
-test.py
-test.ipynb
-sample2.csv
+fmi.txt

@@ -1,4 +1,3 @@
-# import mypy
 import sys
 import shutil
 from datetime import datetime
@@ -48,7 +47,7 @@ class Const:
     ERROR_FILE_NAME = "errors.csv"
     ERROR_CAUSE_FIELD = "error_cause"
     HEADER_ROW = [row[0] for row in csvfile(FIELD_FILE_NAME, ",", False) if row][1:]
-    RESULT_DIR_PATH = Path(__file__).parent / "Result"
+    RESULT_DIR_PATH = Path(__file__).parent / "result"
     LOSS_FIELD_NAME = "claim_amount"
     PREMIUM_FIELD_NAME = "premium_collected"
     CLAIM_TYPE_FIELD_NAME = "coverage_type"
@@ -264,5 +263,6 @@ def write_summary(data_flie_name, result_summary, result_dir):
             prem_amount = type[1][1]
             loss_ratio = type[1][2]
             file.write(f'Claim type \'{type_name}\':\n\t- Claim amount: {clm_amount}\n\t- Total premium collected: {prem_amount}\n\t- Loss Ratio: {loss_ratio}\n')
+
 if __name__ == "__main__":
     main()

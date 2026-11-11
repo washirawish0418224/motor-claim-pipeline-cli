@@ -1,0 +1,26 @@
+claim_id,policy_number,claim_date,claimant_name,vehicle_type,coverage_type,premium_amount,claim_status,incident_location,adjuster_id
+CLM-101,MT-102938,2026-03-01,Somsak Prasert,Sedan,Comprehensive,18000.0,OPEN,Bangkok,ADJ-001
+CLM-102,MT-554109,2026-03-02,Kamonwan S.,SUV,Comprehensive,24000.0,CLOSED,Nonthaburi,ADJ-002
+CLM-103,MT-339281,2026-03-03,Nipon T.,Pickup Truck,Third Party,11000.0,PENDING,Pathum Thani,ADJ-001
+CLM-104,MT-882019,2026-03-04,Chanya P.,EV Hatchback,Comprehensive,22000.0,CLOSED,Chonburi,ADJ-003
+CLM-105,MT-440192,2026-03-05,Wichit R.,Sedan,Collision,15000.0,REJECTED,Bangkok,ADJ-002
+CLM-106,MT-993012,2026-03-06,Preecha K.,Motorcycle,Third Party,5500.0,OPEN,Chiang Mai,ADJ-004
+CLM-107,MT-128401,2026-03-07,Ratree N.,SUV,Fire & Theft,19500.0,CLOSED,Phuket,ADJ-003
+CLM-108,MT-663920,2026-03-08,Ekkachai B.,Sedan,Comprehensive,17500.0,PENDING,Bangkok,ADJ-001
+CLM-109,MT-774019,2026-03-09,Duangjai M.,Pickup Truck,Collision,14000.0,CLOSED,Rayong,ADJ-005
+CLM-110,MT-204918,2026-03-10,Kittisak V.,Sedan,Third Party,9800.0,OPEN,Samut Prakan,ADJ-002
+CLM-111,MT-509210,2026-03-11,Arunee C.,SUV,Comprehensive,26000.0,REJECTED,Khon Kaen,ADJ-004
+CLM-112,MT-819203,2026-03-12,Surachai H.,EV Hatchback,Comprehensive,21000.0,CLOSED,Bangkok,ADJ-001
+CLM-113,MT-301928,2026-03-13,Urai S.,Motorcycle,Third Party,6200.0,PENDING,Nakhon Ratchasima,ADJ-005
+CLM-114,MT-602941,2026-03-14,Teerapat L.,Sedan,Collision,16500.0,OPEN,Bangkok,ADJ-003
+CLM-115,MT-918273,2026-03-15,Benjamas K.,SUV,Fire & Theft,18800.0,CLOSED,Songkhla,ADJ-002
+CLM-116,POL-992019,2026-03-16,Manop W.,Sedan,Comprehensive,18000.0,OPEN,Bangkok,ADJ-001
+CLM-117,MT-123,2026-03-17,Nipaporn G.,SUV,Collision,23000.0,CLOSED,Nonthaburi,ADJ-004
+CLM-118,MT-448291,18/03/2026,Charnvit P.,Pickup Truck,Third Party,12000.0,PENDING,Chonburi,ADJ-002
+CLM-119,MT-772910,2026-03-19,,Sedan,Comprehensive,17000.0,OPEN,Bangkok,ADJ-003
+CLM-120,MT-881029,2026-03-20,Somchai A.,Sedan,Comprehensive,-5000.0,CLOSED,Pathum Thani,ADJ-001
+CLM-121,MT-304918,2026-03-21,Pannipa R.,Motorcycle,Third Party,7000.0,IN_REVIEW,Chiang Mai,ADJ-005
+CLM-122,mt-991029,2026-03-22,Tawatchai S.,SUV,Collision,25000.0,OPEN,Phuket,ADJ-002
+CLM-123,MT-501928,2026-99-99,Siri S.,Sedan,Comprehensive,18500.0,CLOSED,Bangkok,ADJ-001
+CLM-124,MT-110293,2026-03-24,Anan K.,EV Hatchback,,20000.0,PENDING,Samut Prakan,ADJ-004
+CLM-125,MT-663019,2026-03-25,Wandee M.,Sedan,Third Party,10500.0,APPROVED,Rayong,ADJ-003

@@ -1,6 +1,8 @@
 # Motor Claim Data Pipeline CLI
 
+
 A CLI tool that validates raw insurance claim data against schema specifications, isolates malformed rows, and generates financial summaries including loss ratios by coverage type.
+
 
 ## Features
 
