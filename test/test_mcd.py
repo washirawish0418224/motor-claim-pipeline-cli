@@ -1,5 +1,5 @@
 
-from src/mcd.py import main, Const
+from src.mcd import main, Const
 import pytest
 import sys
 from pathlib import Path
