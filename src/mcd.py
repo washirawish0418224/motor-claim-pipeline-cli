@@ -43,7 +43,8 @@ def csvfile(input: str, sep: str, header: bool) -> dict:
             yield row #expect {'policy_number': 'MT',...} or {'field_name': 'policy_number',...}
 
 class Const:
-    FIELD_FILE_NAME = "format.csv"
+    CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
+    FIELD_FILE_NAME = CONFIG_DIR / "format.csv"
     CLEAN_FILE_NAME = "cleaned_data.csv"
     ERROR_FILE_NAME = "errors.csv"
     ERROR_CAUSE_FIELD = "error_cause"
