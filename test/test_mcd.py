@@ -6,13 +6,13 @@ from pathlib import Path
 @pytest.mark.parametrize(
     "code, expected, test_type",
     [
-        (['mcd.py', '-i', 'sample.csv'], "The result is successfully", 'print'), # (["mcd.py", "-i", "sample.csv"], "The result is successfully created in the folder")
-        (['mcd.py', '-i', 'sample2.csv'], "does not include the same set of fields", ValueError),
+        (['mcd.py', '-i', 'sample_data/sample.csv'], "The result is successfully", 'print'), # (["mcd.py", "-i", "sample.csv"], "The result is successfully created in the folder")
+        (['mcd.py', '-i', 'sample_data/sample2.csv'], "does not include the same set of fields", ValueError),
         (['mcd.py'], "2", SystemExit),
-        (['mcd.py', '-i', 'unknown.csv'], "The file \"unknown.csv\" could not be found.", FileNotFoundError), 
+        (['mcd.py', '-i', 'sample_data/unknown.csv'], "The file \"sample_data/unknown.csv\" could not be found.", FileNotFoundError), 
         (['mcd.py', '-i', 'README.md'], "Expecting .csv file type but got .md file type instead.", TypeError),
-        (['mcd.py', '-i', 'sample.csv', '-o', 'my_new_folder'], "The result is successfully created in the folder \"my_new_folder\".", 'print'),
-        (['mcd.py', '-i', 'sample.csv', '-o', 'existed_result'], "successfully created in the folder \"existed_result\"", 'print'),
+        (['mcd.py', '-i', 'sample_data/sample.csv', '-o', 'my_new_folder'], "The result is successfully created in the folder \"my_new_folder\".", 'print'),
+        (['mcd.py', '-i', 'sample_data/sample.csv', '-o', 'existed_result'], "successfully created in the folder \"existed_result\"", 'print'),
         (['mcd.py', '-c'], 'is successfully cleared', 'print')
     ],
     ids=["normal",
