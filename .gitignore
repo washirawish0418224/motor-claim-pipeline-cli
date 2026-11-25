@@ -12,3 +12,8 @@ __pycache__/
 
 fmi.txt
 .ipynb
+
+# Packaging
+*.egg-info/
+dist/
+build/
