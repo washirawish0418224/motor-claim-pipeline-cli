@@ -1,4 +1,3 @@
-
 from src.mcd import main, Const
 import pytest
 import sys

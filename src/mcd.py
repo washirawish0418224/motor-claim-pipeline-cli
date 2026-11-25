@@ -90,7 +90,7 @@ class Record: #contains a row of record
 
 def main():
     parser = argparse.ArgumentParser(
-        description="A program that cleans, export errors into a file, and summarize into a report."
+        description="A CLI tool that validates raw insurance claim data against schema specifications, isolates malformed rows, and generates financial summaries including loss ratios by coverage type."
     )
     
     parser.add_argument(
